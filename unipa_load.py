@@ -16,7 +16,7 @@ day = datetime.date.today()
 today = "{}/{}".format(day.month, day.day)
 
 options = Options()
-options.add_argument('--headless')
+# options.add_argument('--headless')
 driver = webdriver.Chrome('chromedriver.exe', chrome_options=options)
 
 
@@ -26,22 +26,32 @@ def load_unipa_kyuko_data():
     driver.get(URL)
     # ログインする
     data = driver.page_source.encode('utf-8')
-    soup = BeautifulSoup(data)
-    q = soup.find('class', id="form1:logout")
-    if q is not None:
-        driver.find_element_by_id('form1:logout').click()
-
-    driver.find_element_by_id('form1:htmlUserId').send_keys([YOUR_ID])
-    driver.find_element_by_id('form1:htmlPassword').send_keys([YOUR_PASSWORD])
-    driver.find_element_by_id('form1:login').click()
-
-    print('ログイン成功')
+    soup = BeautifulSoup(data, "html.parser")
+    for i in range(5):
+        timeout = soup.find(id="form1:logout")
+        id = soup.find(id="form1:login")
+        if timeout is not None:
+            driver.find_element_by_id('form1:logout').click()
+        elif id is not None:
+            driver.find_element_by_id('form1:htmlUserId').send_keys("ID")
+            driver.find_element_by_id(
+                'form1:htmlPassword').send_keys("PASSWORD")
+            driver.find_element_by_id('form1:login').click()
+            break
+        else:
+            driver.reload()
+            print("retry")
+            if i == 5:
+                print("login error")
+                raise
+        print("login try: " + str(i))
     # ホームから全授業表示、そこから履修中のみにする
     # 5件以上あった場合、すべて表示させるため
     driver.find_element_by_id(
         'form1:Poa00201A:htmlParentTable:1:htmlHeaderTbl:0:allJugyo').click()
     driver.find_element_by_id(
         'form1:Poa00201A:htmlParentTable:1:htmlDisplayOfAll:0:htmlCountCol217').click()
+    print('ログイン成功')
     data = driver.page_source.encode('utf-8')
     soup = BeautifulSoup(data, "html.parser")
     # 件数を取得
@@ -104,9 +114,11 @@ def hatoyama_format(text):
 
 
 def main():
+    global driver
     try:
         load_unipa_kyuko_data()
     except:
+        print("URL_error")
         senju_data = "取得エラー"
         chiba_data = "取得エラー"
         hatoyama_data = "取得エラー"

@@ -16,4 +16,4 @@ def send(out_data, campus):
 
 
 if __name__ == '__main__':
-    send(test, test)
+    send("test_data", "test_campus")
