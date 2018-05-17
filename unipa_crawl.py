@@ -1,7 +1,7 @@
 import is_holiday_or_weekday as holiday
 import unipa_load as unipa
 import send_IFTTT as send
-
+import time
 
 def main():
     unipa.main()
@@ -10,10 +10,10 @@ def main():
     load_hatoyama = unipa.hatoyama_data
     if not holiday.senju():
         send.send(load_senju, "千住")
-        sleep(20)
+        time.sleep(20)
     if not holiday.chiba():
         send.send(load_chiba, "千葉")
-        sleep(20)
+        time.sleep(20)
     if not holiday.hatoyama():
         send.send(load_hatoyama, "鳩山")
 
