@@ -1,12 +1,21 @@
 import requests
 import datetime
-import jpholiday
-import sys
 
 
 def send(out_data, campus):
-    day = datetime.date.today()
     # today = day.strftime("%-m/%-d")
+    re_data = split_str(out_data)
+    for i in range(int(len(re_data))):
+        ifttt(str(re_data[i]),campus)
+        
+        
+def split_str(s):
+    n = 125
+    length = len(s)
+    return [s[i:i+n] for i in range(0, length, n)]
+
+def ifttt(out_data,campus):
+    day = datetime.date.today()
     today = "{}/{}".format(day.month, day.day)
     send_data = {"value1": today, "value2": out_data, "value3": campus}
     headers = {'Content-Type': "application/json"}
@@ -16,4 +25,5 @@ def send(out_data, campus):
 
 
 if __name__ == '__main__':
-    send("test_data", "test_campus")
+    send(["test_data"], "test_campus")
+
