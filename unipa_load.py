@@ -16,8 +16,8 @@ day = datetime.date.today()
 today = "{}/{}".format(day.month, day.day)
 
 options = Options()
-# options.add_argument('--headless')
-driver = webdriver.Chrome('chromedriver.exe', chrome_options=options)
+options.add_argument('--headless')
+driver = webdriver.Chrome('/usr/lib/chromium-browser/chromedriver', chrome_options=options)
 
 
 def load_unipa_kyuko_data():
@@ -25,25 +25,24 @@ def load_unipa_kyuko_data():
     URL = 'https://portal.sa.dendai.ac.jp/up/faces/login/Com00505A.jsp'
     driver.get(URL)
     # ログインする
-    data = driver.page_source.encode('utf-8')
-    soup = BeautifulSoup(data, "html.parser")
     for i in range(5):
+        data = driver.page_source.encode('utf-8')
+        soup = BeautifulSoup(data, "html.parser")
         timeout = soup.find(id="form1:logout")
         id = soup.find(id="form1:login")
         if timeout is not None:
             driver.find_element_by_id('form1:logout').click()
         elif id is not None:
-            driver.find_element_by_id('form1:htmlUserId').send_keys("ID")
+            driver.find_element_by_id('form1:htmlUserId').send_keys(id)
             driver.find_element_by_id(
-                'form1:htmlPassword').send_keys("PASSWORD")
+                'form1:htmlPassword').send_keys(pass)
             driver.find_element_by_id('form1:login').click()
             break
-        else:
-            driver.reload()
-            print("retry")
-            if i == 5:
-                print("login error")
-                raise
+##        driver.reload()
+        print("retry")
+        if i == 5:
+            print("login error")
+            raise
         print("login try: " + str(i))
     # ホームから全授業表示、そこから履修中のみにする
     # 5件以上あった場合、すべて表示させるため
@@ -109,7 +108,7 @@ def chiba_format(text):
 def hatoyama_format(text):
     # print(text)
     global hatoyama_data
-    text = re.sub('鳩山・|%s（.）' % today, '', text)
+    text = re.sub('【鳩山】|%s（.）|「|」' % today, '', text)
     hatoyama_data = hatoyama_data + "\n" + text
 
 
@@ -131,3 +130,4 @@ if __name__ == '__main__':
     print(senju_data)
     print(chiba_data)
     print(hatoyama_data)
+
