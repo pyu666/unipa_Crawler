@@ -3,18 +3,28 @@ import datetime
 
 
 def send(out_data, campus):
-    # today = day.strftime("%-m/%-d")
-    re_data = split_str(out_data)
-    for i in range(int(len(re_data))):
-        ifttt(str(re_data[i]),campus)
-        
-        
+    re_data = ""
+    for i in range(0, len(out_data)):
+    re_data = re_data + list[i] + "\n"
+    if (i % 4 == 0and i != 0):
+        print(re_data)
+        re_data = ""
+    elif(len(out_data) == i + 1):
+        print(re_data)
+# def send(out_data, campus):
+#     # today = day.strftime("%-m/%-d")
+#     re_data = split_str(out_data)
+#     for i in range(int(len(re_data))):
+#         ifttt(str(re_data[i]),campus)
+
+
 def split_str(s):
     n = 125
     length = len(s)
-    return [s[i:i+n] for i in range(0, length, n)]
+    return [s[i:i + n] for i in range(0, length, n)]
 
-def ifttt(out_data,campus):
+
+def ifttt(out_data, campus):
     day = datetime.date.today()
     today = "{}/{}".format(day.month, day.day)
     send_data = {"value1": today, "value2": out_data, "value3": campus}
@@ -26,4 +36,3 @@ def ifttt(out_data,campus):
 
 if __name__ == '__main__':
     send(["test_data"], "test_campus")
-

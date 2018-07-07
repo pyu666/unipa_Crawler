@@ -8,19 +8,22 @@ import datetime
 import sys
 
 
-senju_data = ""
-chiba_data = ""
-hatoyama_data = ""
+senju_data = []
+chiba_data = []
+hatoyama_data = []
 day = datetime.date.today()
 # today = day.strftime("%m/%d")
 today = "{}/{}".format(day.month, day.day)
 
 options = Options()
 options.add_argument('--headless')
-driver = webdriver.Chrome('/usr/lib/chromium-browser/chromedriver', chrome_options=options)
+driver = webdriver.Chrome(
+    '/usr/lib/chromium-browser/chromedriver', chrome_options=options)
 
 
 def load_unipa_kyuko_data():
+    your_pass = ""
+    pour_id = ""
     global driver, senju_data, chiba_data, hatoyama_data
     URL = 'https://portal.sa.dendai.ac.jp/up/faces/login/Com00505A.jsp'
     driver.get(URL)
@@ -33,12 +36,12 @@ def load_unipa_kyuko_data():
         if timeout is not None:
             driver.find_element_by_id('form1:logout').click()
         elif id is not None:
-            driver.find_element_by_id('form1:htmlUserId').send_keys(id)
+            driver.find_element_by_id('form1:htmlUserId').send_keys(your_id)
             driver.find_element_by_id(
-                'form1:htmlPassword').send_keys(pass)
+                'form1:htmlPassword').send_keys(your_pass)
             driver.find_element_by_id('form1:login').click()
             break
-##        driver.reload()
+# driver.reload()
         print("retry")
         if i == 5:
             print("login error")
@@ -83,33 +86,36 @@ def load_unipa_kyuko_data():
             else:
                 print("other" + info_text)
 
-    if senju_data == "":
-        senju_data = "\n今日の休講情報はありません"
-    if chiba_data == "":
-        chiba_data = "\n今日の休講情報はありません"
-    if hatoyama_data == "":
-        hatoyama_data = "\n今日の休講情報はありません"
+    if len(senju_data) == 0:
+        senju_data.append("今日の休講情報はありません")
+    if len(chiba_data) == 0:
+        chiba_data.append("今日の休講情報はありません")
+    if len(hatoyama_data) == 0:
+        hatoyama_data.append("今日の休講情報はありません")
 
 
 def senju_format(text):
     # print(text)
     global senju_data
     text = re.sub('千住・|%s（.）' % today, '', text)
-    senju_data = senju_data + "\n" + text
+    text = re.sub('\u3000', ' ', text)
+    senju_data.append(text)
 
 
 def chiba_format(text):
     # print(text)
     global chiba_data
     text = re.sub('%s（.）' % today, '', text)
-    chiba_data = chiba_data + "\n" + text
+    text = re.sub('\u3000', ' ', text)
+    chiba_data.append(text)
 
 
 def hatoyama_format(text):
     # print(text)
     global hatoyama_data
     text = re.sub('【鳩山】|%s（.）|「|」' % today, '', text)
-    hatoyama_data = hatoyama_data + "\n" + text
+    text = re.sub('\u3000', ' ', text)
+    hatoyama_data.append(text)
 
 
 def main():
@@ -130,4 +136,3 @@ if __name__ == '__main__':
     print(senju_data)
     print(chiba_data)
     print(hatoyama_data)
-
