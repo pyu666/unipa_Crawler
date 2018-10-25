@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 import re
 import datetime
 import sys
-
+import time
 
 senju_data = []
 chiba_data = []
@@ -22,13 +22,14 @@ driver = webdriver.Chrome(
 
 
 def load_unipa_kyuko_data():
-    your_pass = ""
-    pour_id = ""
     global driver, senju_data, chiba_data, hatoyama_data
+    user = "YOUR USER NAME"
+    password = "YOUR PASSWORD"
     URL = 'https://portal.sa.dendai.ac.jp/up/faces/login/Com00505A.jsp'
     driver.get(URL)
     # ログインする
-    for i in range(5):
+    trycount = 20
+    for i in range(trycount):
         data = driver.page_source.encode('utf-8')
         soup = BeautifulSoup(data, "html.parser")
         timeout = soup.find(id="form1:logout")
@@ -36,14 +37,15 @@ def load_unipa_kyuko_data():
         if timeout is not None:
             driver.find_element_by_id('form1:logout').click()
         elif id is not None:
-            driver.find_element_by_id('form1:htmlUserId').send_keys(your_id)
+            driver.find_element_by_id('form1:htmlUserId').send_keys(user)
             driver.find_element_by_id(
-                'form1:htmlPassword').send_keys(your_pass)
+                'form1:htmlPassword').send_keys(password)
             driver.find_element_by_id('form1:login').click()
             break
 # driver.reload()
         print("retry")
-        if i == 5:
+        time.sleep(5)
+        if i == trycount:
             print("login error")
             raise
         print("login try: " + str(i))
